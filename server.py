@@ -91,7 +91,7 @@ def import_from_openfootball(raw):
         score  = m.get("score")
         result = None
         if score and score.get("ft"):
-            ft     = score["ft"]
+            ft = score["ft"]
             result = {"home": ft[0], "away": ft[1]}
 
         matches.append({"id": f"of_{i+1}", "phase": phase, "home": home,
@@ -104,20 +104,33 @@ def fetch_openfootball():
         return json.loads(resp.read().decode('utf-8'))
 
 def auto_import_matches():
-    """Appelé au démarrage si aucun match n'existe — import silencieux en arrière-plan."""
+    """Import automatique au démarrage si aucun match en base."""
     try:
         data = load()
         if len(data.get('matches', [])) == 0:
-            print("[Paris2026] Aucun match trouvé — import automatique depuis openfootball...")
+            print("[Paris2026] Aucun match — import automatique...")
             raw     = fetch_openfootball()
             matches = import_from_openfootball(raw)
             data['matches'] = matches
             save(data)
-            print(f"[Paris2026] ✅ {len(matches)} matchs importés automatiquement.")
+            print(f"[Paris2026] ✅ {len(matches)} matchs importés.")
         else:
-            print(f"[Paris2026] {len(data['matches'])} matchs déjà en base — import auto ignoré.")
+            print(f"[Paris2026] {len(data['matches'])} matchs déjà en base.")
     except Exception as e:
         print(f"[Paris2026] ⚠️  Import auto échoué : {e}")
+
+def validate_bet(winner, score_home, score_away):
+    """Vérifie la cohérence vainqueur/score. Retourne (ok, message)."""
+    if score_home is None or score_away is None:
+        return True, None  # Pas de score saisi, rien à valider
+    sh, sa = int(score_home), int(score_away)
+    if winner == 'home' and sa > sh:
+        return False, "Score incohérent : tu as choisi l'équipe domicile gagnante mais le score indique une victoire extérieure."
+    if winner == 'away' and sh > sa:
+        return False, "Score incohérent : tu as choisi l'équipe extérieure gagnante mais le score indique une victoire domicile."
+    if winner == 'draw' and sh != sa:
+        return False, "Score incohérent : tu as choisi un match nul mais le score n'est pas égal."
+    return True, None
 
 # ── I/O ──────────────────────────────────────────────────────
 def load():
@@ -178,17 +191,29 @@ def get_data():
 @app.route('/api/bet', methods=['POST'])
 def bet():
     b = request.json
-    username, mid = b.get('username'), b.get('matchId')
-    winner = b.get('winner')
-    if not all([username, mid, winner]): return jsonify(error="Données manquantes"), 400
+    username  = b.get('username')
+    mid       = b.get('matchId')
+    winner    = b.get('winner')
+    score_home = b.get('scoreHome')
+    score_away = b.get('scoreAway')
+
+    if not all([username, mid, winner]):
+        return jsonify(error="Données manquantes"), 400
+
+    # Validation cohérence vainqueur / score
+    ok, msg = validate_bet(winner, score_home, score_away)
+    if not ok:
+        return jsonify(error=msg), 400
+
     data = load()
     m = next((x for x in data['matches'] if x['id']==mid), None)
     if not m:       return jsonify(error="Match introuvable"), 404
     if m['result']: return jsonify(error="Match terminé, pari impossible"), 403
     if username not in data['users']: return jsonify(error="Utilisateur inconnu"), 403
+
     if username not in data['bets']: data['bets'][username] = {}
     data['bets'][username][mid] = {
-        "winner": winner, "scoreHome": b.get('scoreHome'), "scoreAway": b.get('scoreAway')
+        "winner": winner, "scoreHome": score_home, "scoreAway": score_away
     }
     save(data)
     return jsonify(ok=True)
@@ -206,7 +231,6 @@ def import_matches():
         return jsonify(error=f"Impossible de récupérer les données : {str(e)}"), 502
 
     new_matches = import_from_openfootball(raw)
-
     if replace:
         existing_results = {m['id']: m['result'] for m in data['matches'] if m.get('result')}
         for m in new_matches:
@@ -240,7 +264,6 @@ def sync_results():
         if m['id'] in result_map and not m.get('result'):
             m['result'] = result_map[m['id']]
             updated += 1
-
     save(data)
     return jsonify(ok=True, updated=updated)
 
@@ -300,7 +323,6 @@ def promote():
     return jsonify(ok=True, isAdmin=data['users'][target]['isAdmin'])
 
 # ── Démarrage ─────────────────────────────────────────────────
-# Import automatique des matchs en arrière-plan si la base est vide
 threading.Thread(target=auto_import_matches, daemon=True).start()
 
 if __name__ == '__main__':
