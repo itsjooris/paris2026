@@ -106,7 +106,10 @@ def fetch_openfootball():
 def auto_import_matches():
     """Import automatique au démarrage si aucun match en base."""
     try:
+        print(f"[Paris2026] DATA_FILE = {DATA_FILE}")
+        print(f"[Paris2026] Fichier existe : {os.path.exists(DATA_FILE)}")
         data = load()
+        print(f"[Paris2026] {len(data.get('users', {}))} utilisateur(s) en base")
         if len(data.get('matches', [])) == 0:
             print("[Paris2026] Aucun match — import automatique...")
             raw     = fetch_openfootball()
@@ -138,7 +141,21 @@ def load():
         save(DEFAULT_DATA)
         return dict(DEFAULT_DATA)
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
+        data = json.load(f)
+    # Migration : ajouter les clés manquantes sans écraser l'existant
+    changed = False
+    for key, default_val in DEFAULT_DATA.items():
+        if key not in data:
+            data[key] = default_val
+            changed = True
+    if 'settings' in data:
+        for sk, sv in DEFAULT_DATA['settings'].items():
+            if sk not in data['settings']:
+                data['settings'][sk] = sv
+                changed = True
+    if changed:
+        save(data)
+    return data
 
 def save(data):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
