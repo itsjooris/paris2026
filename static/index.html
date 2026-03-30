@@ -203,7 +203,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
       <div id="pane-reg" style="display:none">
         <div class="form-group"><label>Pseudo</label><input id="r-name" type="text" placeholder="Ex: Zizou_94" autocomplete="off"></div>
         <div class="form-group"><label>Mot de passe</label><input id="r-pass" type="password" placeholder="Min. 3 caractères"></div>
-        <div class="form-group"><label>Confirmer</label><input id="r-pass2" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <div class="form-group"><label>Confirmer</label><input id="r-pass2" type="password" placeholder="••••••"></div>
+        <div class="form-group" id="invite-code-group" style="display:none"><label>Code d'invitation</label><input id="r-invite" type="text" placeholder="Code fourni par l'admin" autocomplete="off"></div>
         <button class="btn btn-gold btn-full" onclick="doRegister()">Créer mon compte ✨</button>
       </div>
     </div>
@@ -280,6 +281,30 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
     <div class="import-status" id="import-status"></div>
   </div>
 
+  <!-- Invite code settings -->
+  <div class="card" style="margin-bottom:1rem" id="invite-settings-card">
+    <div class="card-title">🔐 Code d'invitation</div>
+    <p style="font-size:0.75rem;color:var(--muted);font-family:'Courier New',monospace;margin-bottom:1rem;line-height:1.7">
+      Quand activé, les nouveaux inscrits doivent saisir ce code pour créer un compte.
+    </p>
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;margin:0">
+        <input type="checkbox" id="invite-toggle" onchange="adminToggleInvite()" style="width:auto;accent-color:var(--gold)">
+        <span style="font-family:'Courier New',monospace;font-size:0.82rem" id="invite-toggle-label">Désactivé</span>
+      </label>
+    </div>
+    <div id="invite-code-settings" style="display:none">
+      <div style="display:flex;gap:0.6rem;align-items:flex-end;flex-wrap:wrap">
+        <div class="form-group" style="flex:1;min-width:180px;margin-bottom:0">
+          <label>Code</label>
+          <input id="invite-code-input" type="text" placeholder="Ex: PARIS2026" autocomplete="off">
+        </div>
+        <button class="btn btn-gold" onclick="adminSaveInvite()">💾 Enregistrer</button>
+      </div>
+      <div id="invite-status" style="margin-top:0.6rem;font-family:'Courier New',monospace;font-size:0.75rem;color:var(--muted);min-height:1.2rem"></div>
+    </div>
+  </div>
+
   <div class="grid2" style="margin-bottom:1rem">
     <div class="card">
       <div class="card-title">➕ Ajouter un match manuellement</div>
@@ -328,7 +353,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
-let STATE = {users:{}, matches:[], bets:{}};
+let STATE = {users:{}, matches:[], bets:{}, invite_required:false};
 let ME    = sessionStorage.getItem('wc_me')    || null;
 let ADMIN = sessionStorage.getItem('wc_admin') === '1';
 let PHASE_FILTER = 'all';
@@ -342,7 +367,11 @@ async function api(path, method='GET', body=null) {
   if (!res.ok) throw new Error(js.error || 'Erreur serveur');
   return js;
 }
-async function sync() { STATE = await api('/api/data'); }
+async function sync() {
+  STATE = await api('/api/data');
+  const ig=document.getElementById('invite-code-group');
+  if(ig) ig.style.display=STATE.invite_required?'':'none';
+}
 
 // ═══════════════════════════════════════════════════════════
 //  AUTH
@@ -355,10 +384,12 @@ function authTab(t) {
   setAlert('auth-alert','','');
 }
 async function doRegister() {
-  const name=v('r-name'), pass=v('r-pass'), pass2=v('r-pass2');
+  const name=v('r-name'), pass=v('r-pass'), pass2=v('r-pass2'), invite=v('r-invite');
   if (pass!==pass2) return setAlert('auth-alert','Les mots de passe diffèrent','err');
   try {
-    const r = await api('/api/register','POST',{name,password:pass});
+    const body={name,password:pass};
+    if (STATE.invite_required) body.invite_code=invite;
+    const r = await api('/api/register','POST',body);
     startSession(name, r.isAdmin);
     setAlert('auth-alert','Bienvenue '+name+' 🎉','ok');
     setTimeout(()=>goTo('matches'), 800);
@@ -710,6 +741,7 @@ function renderLB(){
 // ═══════════════════════════════════════════════════════════
 function renderAdmin(){
   if (!ADMIN){goTo('matches');return;}
+  loadInviteSettings();
   document.getElementById('admin-users').innerHTML=Object.keys(STATE.users).map(u=>`
     <div class="user-row">
       <span style="font-family:'Courier New',monospace;font-size:0.82rem">${STATE.users[u].isAdmin?'👑':''} ${u}</span>
@@ -828,6 +860,48 @@ async function adminReset(){
   if (!confirm('Vider tous les matchs et paris ? (les comptes sont conservés)')) return;
   try { await api('/api/admin/reset','POST',{username:ME}); toast('Vidé'); await sync(); renderAdmin(); }
   catch(e){toast(e.message);}
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ADMIN — INVITE CODE
+// ═══════════════════════════════════════════════════════════
+async function loadInviteSettings(){
+  try {
+    const r=await api(`/api/admin/settings?username=${encodeURIComponent(ME)}`);
+    const s=r.settings||{};
+    const toggle=document.getElementById('invite-toggle');
+    const label=document.getElementById('invite-toggle-label');
+    const panel=document.getElementById('invite-code-settings');
+    const input=document.getElementById('invite-code-input');
+    toggle.checked=!!s.invite_required;
+    label.textContent=s.invite_required?'Activé':'Désactivé';
+    label.style.color=s.invite_required?'var(--green)':'var(--muted)';
+    panel.style.display=s.invite_required?'':'none';
+    input.value=s.invite_code||'';
+  } catch(e){}
+}
+async function adminToggleInvite(){
+  const on=document.getElementById('invite-toggle').checked;
+  try {
+    await api('/api/admin/settings','POST',{username:ME,invite_required:on});
+    toast(on?'Code d\'invitation activé 🔐':'Code d\'invitation désactivé 🔓');
+    await sync(); loadInviteSettings();
+  } catch(e){toast(e.message);}
+}
+async function adminSaveInvite(){
+  const code=v('invite-code-input');
+  if(!code){toast('Saisis un code !');return;}
+  const status=document.getElementById('invite-status');
+  try {
+    await api('/api/admin/settings','POST',{username:ME,invite_code:code});
+    status.style.color='var(--green)';
+    status.textContent='✅ Code enregistré : '+code;
+    toast('Code enregistré ✅');
+  } catch(e){
+    status.style.color='var(--red)';
+    status.textContent='❌ '+e.message;
+    toast(e.message);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════

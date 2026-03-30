@@ -10,7 +10,7 @@ DATA_FILE = os.path.join(os.environ.get('DATA_DIR', os.path.dirname(__file__)), 
 
 OPENFOOTBALL_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json"
 
-DEFAULT_DATA = {"users": {}, "bets": {}, "matches": []}
+DEFAULT_DATA = {"users": {}, "bets": {}, "matches": [], "settings": {"invite_code": "", "invite_required": False}}
 
 FLAGS = {
     "Mexico":"Mexique 🇲🇽","South Africa":"Afrique du Sud 🇿🇦","South Korea":"Corée du Sud 🇰🇷",
@@ -164,8 +164,13 @@ def register():
     if len(name) < 2: return jsonify(error="Pseudo trop court (min. 2 car.)"), 400
     if len(pwd)  < 3: return jsonify(error="Mot de passe trop court (min. 3 car.)"), 400
     data = load()
-    if name in data['users']: return jsonify(error="Pseudo déjà pris"), 409
+    settings = data.get('settings', DEFAULT_DATA['settings'])
     first = len(data['users']) == 0
+    if not first and settings.get('invite_required') and settings.get('invite_code'):
+        code = b.get('invite_code', '').strip()
+        if code != settings['invite_code']:
+            return jsonify(error="Code d'invitation invalide"), 403
+    if name in data['users']: return jsonify(error="Pseudo déjà pris"), 409
     data['users'][name] = {"password": hp(pwd), "isAdmin": first}
     save(data)
     return jsonify(ok=True, isAdmin=first)
@@ -184,8 +189,10 @@ def login():
 @app.route('/api/data')
 def get_data():
     data = load()
+    settings = data.get('settings', DEFAULT_DATA['settings'])
     users_safe = {k: {"isAdmin": v["isAdmin"]} for k,v in data['users'].items()}
-    return jsonify(users=users_safe, matches=data['matches'], bets=data['bets'])
+    return jsonify(users=users_safe, matches=data['matches'], bets=data['bets'],
+                   invite_required=settings.get('invite_required', False))
 
 # ── Bets ──────────────────────────────────────────────────────
 @app.route('/api/bet', methods=['POST'])
@@ -333,6 +340,29 @@ def del_user(target):
     data['bets'].pop(target, None)
     save(data)
     return jsonify(ok=True)
+
+# ── Admin — Settings ─────────────────────────────────────────
+@app.route('/api/admin/settings', methods=['GET'])
+def get_settings():
+    username = request.args.get('username','')
+    data = load()
+    if not is_admin(data, username): return jsonify(error="Accès refusé"), 403
+    settings = data.get('settings', DEFAULT_DATA['settings'])
+    return jsonify(ok=True, settings=settings)
+
+@app.route('/api/admin/settings', methods=['POST'])
+def update_settings():
+    b = request.json
+    data = load()
+    if not is_admin(data, b.get('username')): return jsonify(error="Accès refusé"), 403
+    if 'settings' not in data:
+        data['settings'] = dict(DEFAULT_DATA['settings'])
+    if 'invite_code' in b:
+        data['settings']['invite_code'] = b['invite_code'].strip()
+    if 'invite_required' in b:
+        data['settings']['invite_required'] = bool(b['invite_required'])
+    save(data)
+    return jsonify(ok=True, settings=data['settings'])
 
 # ── Démarrage ─────────────────────────────────────────────────
 threading.Thread(target=auto_import_matches, daemon=True).start()
