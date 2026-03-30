@@ -358,7 +358,26 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
 
 <!-- ══ ADMIN ══ -->
 <div class="page" id="page-admin">
-  <div class="grid2" style="margin-bottom:1rem">
+  <div class="card" style="margin-bottom:1rem">
+  <div class="card-title">🌍 Import automatique des matchs</div>
+  <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem;font-family:'Courier New',monospace">
+    Importe les <strong style="color:var(--text)">104 matchs officiels</strong> de la Coupe du Monde 2026 depuis la base de données open source openfootball.<br>
+    Les heures sont converties automatiquement en <strong style="color:var(--text)">heure de Paris (CEST)</strong>.
+  </p>
+  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center">
+    <button class="btn btn-gold" onclick="adminImport(false)" id="btn-import">
+      ⬇️ Importer les matchs
+    </button>
+    <button class="btn btn-ghost" onclick="adminImport(true)" id="btn-reimport">
+      🔄 Tout remplacer
+    </button>
+    <button class="btn btn-ghost" onclick="adminSync()" id="btn-sync">
+      ⚡ Sync résultats live
+    </button>
+  </div>
+  <div id="import-status" style="margin-top:0.8rem;font-family:'Courier New',monospace;font-size:0.78rem;color:var(--muted)"></div>
+</div>
+<div class="grid2" style="margin-bottom:1rem">
     <div class="card">
       <div class="card-title">➕ Nouveau match</div>
       <div class="form-group">
@@ -842,6 +861,60 @@ function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
   clearTimeout(_t); _t=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+
+// ── Admin — Import & Sync ─────────────────────────────────────
+async function adminImport(replace) {
+  const msg = replace
+    ? 'Remplacer tous les matchs existants par les données officielles ?\n(Les résultats déjà saisis manuellement sont conservés)'
+    : null;
+  if (msg && !confirm(msg)) return;
+
+  const status = document.getElementById('import-status');
+  const btn    = document.getElementById(replace ? 'btn-reimport' : 'btn-import');
+  btn.disabled = true;
+  status.textContent = '⏳ Import en cours…';
+  status.style.color = 'var(--muted)';
+
+  try {
+    const r = await api('/api/admin/import', 'POST', { username: ME, replace });
+    status.textContent = `✅ ${r.imported} match(s) importé(s) — total : ${r.total} matchs`;
+    status.style.color = 'var(--green)';
+    toast(`✅ ${r.imported} matchs importés !`);
+    await sync(); renderAdmin(); renderMatches && renderMatches();
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--red)';
+    toast('Erreur import : ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function adminSync() {
+  const btn    = document.getElementById('btn-sync');
+  const status = document.getElementById('import-status');
+  btn.disabled = true;
+  status.textContent = '⏳ Synchronisation des résultats…';
+  status.style.color = 'var(--muted)';
+
+  try {
+    const r = await api('/api/admin/sync', 'POST', { username: ME });
+    const msg = r.updated > 0
+      ? `⚡ ${r.updated} nouveau(x) résultat(s) synchronisé(s)`
+      : '✅ Aucun nouveau résultat disponible';
+    status.textContent = msg;
+    status.style.color = r.updated > 0 ? 'var(--green)' : 'var(--muted)';
+    toast(msg);
+    if (r.updated > 0) { await sync(); renderAdmin(); renderUserBar(); }
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--red)';
+    toast('Erreur sync : ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════
