@@ -716,7 +716,8 @@ function renderAdmin(){
       <div style="display:flex;align-items:center;gap:0.5rem">
         <span style="color:var(--gold);font-weight:bold;font-family:'Courier New',monospace">${computePts(u)} pts</span>
         ${u!==ME?`<button class="btn btn-ghost btn-sm" onclick="adminPromote('${u}')">
-          ${STATE.users[u].isAdmin?'Retirer admin':'Rendre admin'}</button>`:''}
+          ${STATE.users[u].isAdmin?'Retirer admin':'Rendre admin'}</button>
+          <button class="btn btn-danger btn-sm" onclick="adminDelUser('${u}')">🗑️</button>`:''}
       </div>
     </div>`).join('')||'<div style="color:var(--muted);font-size:0.82rem">Aucun utilisateur</div>';
 
@@ -813,6 +814,14 @@ async function adminPromote(target){
     const r=await api('/api/admin/promote','POST',{username:ME,target});
     toast(r.isAdmin?target+' est admin 👑':'Droits retirés');
     await sync(); renderAdmin();
+  } catch(e){toast(e.message);}
+}
+async function adminDelUser(target){
+  if (!confirm(`Supprimer le compte "${target}" et tous ses paris ?`)) return;
+  try {
+    await api(`/api/admin/user/${encodeURIComponent(target)}?username=${encodeURIComponent(ME)}`,'DELETE');
+    toast(`${target} supprimé 🗑️`);
+    await sync(); renderAdmin(); renderLB();
   } catch(e){toast(e.message);}
 }
 async function adminReset(){

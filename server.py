@@ -322,6 +322,18 @@ def promote():
     save(data)
     return jsonify(ok=True, isAdmin=data['users'][target]['isAdmin'])
 
+@app.route('/api/admin/user/<target>', methods=['DELETE'])
+def del_user(target):
+    username = request.args.get('username','')
+    data = load()
+    if not is_admin(data, username): return jsonify(error="Accès refusé"), 403
+    if target == username: return jsonify(error="Tu ne peux pas te supprimer toi-même"), 400
+    if target not in data['users']: return jsonify(error="Utilisateur introuvable"), 404
+    del data['users'][target]
+    data['bets'].pop(target, None)
+    save(data)
+    return jsonify(ok=True)
+
 # ── Démarrage ─────────────────────────────────────────────────
 threading.Thread(target=auto_import_matches, daemon=True).start()
 
