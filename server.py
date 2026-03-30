@@ -2,7 +2,7 @@
 Paris 2026 — Serveur Flask
 """
 from flask import Flask, request, jsonify, send_from_directory
-import json, os, hashlib, time, urllib.request
+import json, os, hashlib, time, urllib.request, threading
 from datetime import datetime, timezone, timedelta
 
 app = Flask(__name__, static_folder='static')
@@ -45,7 +45,8 @@ PHASE_FR = {
 }
 
 UTC_OFFSETS = {"UTC-4":-4,"UTC-5":-5,"UTC-6":-6,"UTC-7":-7}
-MONTHS_FR   = {1:"jan",2:"fév",3:"mar",4:"avr",5:"mai",6:"juin",7:"juil",8:"août",9:"sep",10:"oct",11:"nov",12:"déc"}
+MONTHS_FR   = {1:"jan",2:"fév",3:"mar",4:"avr",5:"mai",6:"juin",
+               7:"juil",8:"août",9:"sep",10:"oct",11:"nov",12:"déc"}
 
 def translate_team(name):
     return FLAGS.get(name, name)
@@ -78,15 +79,14 @@ def import_from_openfootball(raw):
 
         phase = PHASE_FR.get(group, PHASE_FR.get(round_name, round_name))
 
-        # Équipe inconnue (éliminatoires) : placeholder lisible
         def fmt_team(t, side):
             if not t or t.startswith("W") or t.startswith("L") or (t and t[0].isdigit() and len(t) <= 4):
-                return f"🏆 Qualifié {num or '?'} ({side})" if num else "À déterminer"
+                return f"Qualifié M{num} ({side})" if num else "À déterminer"
             return translate_team(t)
 
-        home     = fmt_team(team1, "dom")
-        away     = fmt_team(team2, "ext")
-        date_fr  = convert_to_paris_time(date, time_raw) if date and time_raw else date
+        home    = fmt_team(team1, "dom")
+        away    = fmt_team(team2, "ext")
+        date_fr = convert_to_paris_time(date, time_raw) if date and time_raw else date
 
         score  = m.get("score")
         result = None
@@ -98,6 +98,28 @@ def import_from_openfootball(raw):
                         "away": away, "date": date_fr, "ground": ground, "result": result})
     return matches
 
+def fetch_openfootball():
+    req = urllib.request.Request(OPENFOOTBALL_URL, headers={'User-Agent': 'Paris2026/1.0'})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read().decode('utf-8'))
+
+def auto_import_matches():
+    """Appelé au démarrage si aucun match n'existe — import silencieux en arrière-plan."""
+    try:
+        data = load()
+        if len(data.get('matches', [])) == 0:
+            print("[Paris2026] Aucun match trouvé — import automatique depuis openfootball...")
+            raw     = fetch_openfootball()
+            matches = import_from_openfootball(raw)
+            data['matches'] = matches
+            save(data)
+            print(f"[Paris2026] ✅ {len(matches)} matchs importés automatiquement.")
+        else:
+            print(f"[Paris2026] {len(data['matches'])} matchs déjà en base — import auto ignoré.")
+    except Exception as e:
+        print(f"[Paris2026] ⚠️  Import auto échoué : {e}")
+
+# ── I/O ──────────────────────────────────────────────────────
 def load():
     if not os.path.exists(DATA_FILE):
         save(DEFAULT_DATA)
@@ -115,11 +137,6 @@ def hp(pwd):
 def is_admin(data, username):
     u = data['users'].get(username)
     return u and u.get('isAdmin', False)
-
-def fetch_openfootball():
-    req = urllib.request.Request(OPENFOOTBALL_URL, headers={'User-Agent': 'Paris2026/1.0'})
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        return json.loads(resp.read().decode('utf-8'))
 
 # ── Static ────────────────────────────────────────────────────
 @app.route('/')
@@ -179,15 +196,10 @@ def bet():
 # ── Admin — Import ────────────────────────────────────────────
 @app.route('/api/admin/import', methods=['POST'])
 def import_matches():
-    """Importe les 104 matchs depuis openfootball.
-       replace=true  → remplace tous les matchs existants (conserve résultats manuels)
-       replace=false → ajoute seulement les matchs absents
-    """
     b = request.json
     data = load()
     if not is_admin(data, b.get('username')): return jsonify(error="Accès refusé"), 403
     replace = b.get('replace', False)
-
     try:
         raw = fetch_openfootball()
     except Exception as e:
@@ -196,7 +208,6 @@ def import_matches():
     new_matches = import_from_openfootball(raw)
 
     if replace:
-        # Préserve les résultats saisis manuellement sur les matchs existants
         existing_results = {m['id']: m['result'] for m in data['matches'] if m.get('result')}
         for m in new_matches:
             if m['id'] in existing_results:
@@ -215,18 +226,15 @@ def import_matches():
 # ── Admin — Sync résultats ────────────────────────────────────
 @app.route('/api/admin/sync', methods=['POST'])
 def sync_results():
-    """Récupère les scores déjà joués depuis openfootball et les applique."""
     b = request.json
     data = load()
     if not is_admin(data, b.get('username')): return jsonify(error="Accès refusé"), 403
-
     try:
         raw = fetch_openfootball()
     except Exception as e:
         return jsonify(error=f"Impossible de récupérer les données : {str(e)}"), 502
 
     result_map = {m['id']: m['result'] for m in import_from_openfootball(raw) if m.get('result')}
-
     updated = 0
     for m in data['matches']:
         if m['id'] in result_map and not m.get('result'):
@@ -290,6 +298,10 @@ def promote():
     data['users'][target]['isAdmin'] = not data['users'][target].get('isAdmin', False)
     save(data)
     return jsonify(ok=True, isAdmin=data['users'][target]['isAdmin'])
+
+# ── Démarrage ─────────────────────────────────────────────────
+# Import automatique des matchs en arrière-plan si la base est vide
+threading.Thread(target=auto_import_matches, daemon=True).start()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
