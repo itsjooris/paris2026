@@ -88,7 +88,7 @@ select option{background:var(--bg3)}
 .match-date{font-size:0.65rem;color:var(--muted);font-family:'Courier New',monospace}
 .match-teams{display:flex;align-items:center;gap:0.3rem;margin:0.5rem 0 0.9rem}
 .team{flex:1;text-align:center}
-.flag{font-size:1.9rem;line-height:1;display:block}
+.flag{font-size:1.9rem;line-height:1;display:flex;align-items:center;justify-content:center;min-height:42px}
 .tname{font-size:0.72rem;color:var(--muted);margin-top:0.2rem;font-family:'Courier New',monospace;line-height:1.2}
 .vs{color:var(--gold);font-weight:900;font-size:0.9rem;opacity:0.6;padding:0 0.2rem}
 
@@ -454,9 +454,44 @@ function computeStats(u) {
 // ═══════════════════════════════════════════════════════════
 //  MATCHES
 // ═══════════════════════════════════════════════════════════
+const COUNTRY_CODES = {
+  'Mexique':'mx','Afrique du Sud':'za','Corée du Sud':'kr','Canada':'ca','Qatar':'qa',
+  'Suisse':'ch','Brésil':'br','Maroc':'ma','Haïti':'ht','Écosse':'gb-sct',
+  'États-Unis':'us','Paraguay':'py','Australie':'au','Allemagne':'de','Curaçao':'cw',
+  "Côte d'Ivoire":'ci','Équateur':'ec','Pays-Bas':'nl','Japon':'jp','Tunisie':'tn',
+  'Belgique':'be','Égypte':'eg','Iran':'ir','Nouvelle-Zélande':'nz','Espagne':'es',
+  'Cap-Vert':'cv','Arabie Saoudite':'sa','Uruguay':'uy','France':'fr','Sénégal':'sn',
+  'Norvège':'no','Argentine':'ar','Algérie':'dz','Autriche':'at','Jordanie':'jo',
+  'Portugal':'pt','Ouzbékistan':'uz','Colombie':'co','Angleterre':'gb-eng','Croatie':'hr',
+  'Ghana':'gh','Panama':'pa','Pologne':'pl','Serbie':'rs','Ukraine':'ua','Danemark':'dk',
+  'Suède':'se','Turquie':'tr','Cameroun':'cm','Nigéria':'ng','Venezuela':'ve','Chili':'cl',
+  'Pérou':'pe','Costa Rica':'cr','Honduras':'hn','Jamaïque':'jm','Irak':'iq',
+  'Indonésie':'id','Chine':'cn','Thaïlande':'th',
+  // English fallbacks
+  'Mexico':'mx','South Africa':'za','South Korea':'kr','Brazil':'br','Morocco':'ma',
+  'Haiti':'ht','Scotland':'gb-sct','USA':'us','Australia':'au','Germany':'de',
+  'Ivory Coast':'ci','Ecuador':'ec','Netherlands':'nl','Japan':'jp','Tunisia':'tn',
+  'Belgium':'be','Egypt':'eg','New Zealand':'nz','Spain':'es','Cape Verde':'cv',
+  'Saudi Arabia':'sa','Senegal':'sn','Norway':'no','Argentina':'ar','Algeria':'dz',
+  'Austria':'at','Jordan':'jo','Portugal':'pt','Uzbekistan':'uz','Colombia':'co',
+  'England':'gb-eng','Croatia':'hr','Ghana':'gh','Panama':'pa','Poland':'pl',
+  'Serbia':'rs','Ukraine':'ua','Denmark':'dk','Sweden':'se','Turkey':'tr',
+  'Cameroon':'cm','Nigeria':'ng','Venezuela':'ve','Chile':'cl','Peru':'pe',
+  'Costa Rica':'cr','Honduras':'hn','Jamaica':'jm','Iraq':'iq','Indonesia':'id',
+  'China':'cn','Thailand':'th','France':'fr','Canada':'ca','Qatar':'qa',
+  'Switzerland':'ch','Paraguay':'py','Uruguay':'uy',
+};
+
+function getCountryCode(teamName) {
+  const name = noFlag(teamName);
+  return COUNTRY_CODES[name] || null;
+}
+
 function flag(team) {
+  const code = getCountryCode(team);
+  if (code) return `<img src="https://flagcdn.com/w80/${code}.png" alt="${noFlag(team)}" style="width:42px;height:auto;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.35);display:inline-block;vertical-align:middle;">`;
   const m=team.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})+$/u);
-  return m?m[0]:'🏳️';
+  return m?`<span style="font-size:1.9rem">${m[0]}</span>`:'<span style="font-size:1.9rem">🏳️</span>';
 }
 function noFlag(team) { return team.replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})+$/u,'').trim(); }
 
