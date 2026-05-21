@@ -1,0 +1,30 @@
+# Git
+.git/
+.gitignore
+
+# Python caches and compiles
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Local databases, data files and backups
+*.json
+*.sqlite
+*.db
+/data/
+
+# Docker/Development configuration
+docker-compose*.yml
+Dockerfile
+.dockerignore
+.env
+.flaskenv
