@@ -60,6 +60,10 @@ select option{background:var(--bg3)}
 .btn-green:hover{background:rgba(34,197,94,0.25)}
 .btn-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#FF8888}
 .btn-danger:hover{background:rgba(239,68,68,0.2)}
+.btn-paid{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);color:var(--green)}
+.btn-paid:hover{background:rgba(34,197,94,0.22)}
+.btn-unpaid{background:rgba(242,193,78,0.08);border:1px solid rgba(242,193,78,0.25);color:var(--gold)}
+.btn-unpaid:hover{background:rgba(242,193,78,0.16)}
 .btn-sm{padding:0.38rem 0.9rem;font-size:0.75rem}
 .btn:disabled{opacity:0.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 .btn-full{width:100%;justify-content:center}
@@ -81,6 +85,7 @@ select option{background:var(--bg3)}
 .matches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(305px,1fr));gap:0.85rem}
 .match-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;transition:border-color 0.22s,transform 0.18s;position:relative;overflow:hidden;}
 .match-card:hover{border-color:var(--border-gold);transform:translateY(-1px)}
+.match-card.started{border-color:rgba(239,68,68,0.2);opacity:0.85}
 .match-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity 0.3s;}
 .match-card:hover::before{opacity:0.6}
 .match-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem}
@@ -91,6 +96,9 @@ select option{background:var(--bg3)}
 .flag{font-size:1.9rem;line-height:1;display:flex;align-items:center;justify-content:center;min-height:42px}
 .tname{font-size:0.72rem;color:var(--muted);margin-top:0.2rem;font-family:'Courier New',monospace;line-height:1.2}
 .vs{color:var(--gold);font-weight:900;font-size:0.9rem;opacity:0.6;padding:0 0.2rem}
+
+/* Badge "match commencé" */
+.b-started{background:rgba(239,68,68,0.08);color:var(--red);border:1px solid rgba(239,68,68,0.25);font-size:0.7rem;padding:0.35rem 0.7rem;border-radius:7px;font-family:'Courier New',monospace;text-align:center;margin-top:0.5rem}
 
 .bet-area{border-top:1px solid var(--border);padding-top:0.9rem}
 .bet-lbl{font-size:0.65rem;color:var(--muted);font-family:'Courier New',monospace;letter-spacing:1px;margin-bottom:0.45rem}
@@ -113,6 +121,7 @@ select option{background:var(--bg3)}
 .b-nobet  {background:rgba(239,68,68,0.07);color:var(--muted);border:1px solid rgba(239,68,68,0.18)}
 .login-prompt{text-align:center;padding:0.8rem;color:var(--muted);font-size:0.78rem;font-family:'Courier New',monospace}
 
+/* Leaderboard */
 .lb-wrap{display:flex;flex-direction:column;gap:0.5rem}
 .lb-row{display:flex;align-items:center;gap:1rem;padding:0.85rem 1.2rem;border-radius:11px;background:var(--bg3);border:1px solid var(--border);transition:all 0.2s;}
 .lb-row:nth-child(1){border-color:rgba(255,215,0,0.35);background:rgba(255,215,0,0.05)}
@@ -121,10 +130,13 @@ select option{background:var(--bg3)}
 .lb-row.me{border-color:var(--border-gold)!important;background:rgba(242,193,78,0.05)!important}
 .lb-rank{font-size:1.2rem;width:2rem;text-align:center;flex-shrink:0}
 .lb-info{flex:1;min-width:0}
-.lb-name{font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-name{font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:0.4rem}
 .lb-sub{font-size:0.7rem;color:var(--muted);font-family:'Courier New',monospace;margin-top:0.15rem}
 .lb-pts{font-size:1.35rem;font-weight:900;color:var(--gold);font-family:'Courier New',monospace;flex-shrink:0}
 .lb-pts span{font-size:0.7rem;color:var(--muted);font-weight:normal}
+/* Badge "payé" dans le leaderboard */
+.paid-badge{font-size:0.78rem;title:cursor:default}
+.unpaid-badge{font-size:0.78rem;opacity:0.35;title:cursor:default}
 
 .picks-stats{display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.2rem}
 .stat-chip{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:0.6rem 1rem;text-align:center;flex:1;min-width:90px;}
@@ -142,14 +154,20 @@ select option{background:var(--bg3)}
 .adm-row{display:flex;align-items:center;gap:0.7rem;background:var(--bg3);border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.5rem;flex-wrap:wrap;border:1px solid var(--border);}
 .adm-row .lbl{flex:1;font-size:0.85rem;min-width:150px}
 .adm-row input[type=number]{width:52px}
-.user-row{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);gap:0.5rem}
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid var(--border);gap:0.5rem}
 .user-row:last-child{border-bottom:none}
+.user-name-cell{display:flex;align-items:center;gap:0.45rem;font-family:'Courier New',monospace;font-size:0.82rem;flex:1;min-width:0}
 
 /* Import card */
 .import-card{background:linear-gradient(135deg,rgba(242,193,78,0.06),rgba(34,197,94,0.04));border:1px solid var(--border-gold);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;}
 .import-card .card-title{color:var(--gold)}
 .import-btns{display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:1rem}
 .import-status{margin-top:0.8rem;font-family:'Courier New',monospace;font-size:0.78rem;color:var(--muted);min-height:1.2rem}
+
+/* Auto-sync indicator */
+.sync-indicator{display:inline-flex;align-items:center;gap:0.4rem;font-family:'Courier New',monospace;font-size:0.72rem;color:var(--green);background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:6px;padding:0.25rem 0.65rem;margin-left:0.5rem}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
 .rule-box{background:var(--bg3);border-radius:11px;padding:1.2rem;line-height:1.9;font-size:0.88rem}
 .rule-box ul{margin:0.5rem 0 0.5rem 1.2rem}
@@ -255,7 +273,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
       <hr class="div">
       <strong>Règles :</strong>
       <ul>
-        <li>Paris modifiables tant qu'aucun résultat n'est saisi</li>
+        <li>Paris bloqués dès le coup d'envoi du match</li>
+        <li>Les résultats se synchronisent automatiquement</li>
         <li>Le classement se met à jour après chaque résultat</li>
         <li>En cas d'égalité : plus de bons résultats l'emporte</li>
       </ul>
@@ -266,16 +285,19 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
 <!-- ADMIN -->
 <div class="page" id="page-admin">
 
-  <!-- Import card — toujours visible en haut -->
+  <!-- Import card -->
   <div class="import-card">
-    <div class="card-title">🌍 Import &amp; Synchronisation des matchs</div>
+    <div class="card-title">
+      🌍 Import &amp; Synchronisation des matchs
+      <span class="sync-indicator"><span class="sync-dot"></span>Auto-sync actif · 3 min</span>
+    </div>
     <p style="font-size:0.8rem;color:var(--muted);font-family:'Courier New',monospace;line-height:1.7">
       Source : <strong style="color:var(--text)">openfootball/worldcup.json</strong> (GitHub, open source, sans clé API)<br>
       104 matchs officiels · heures converties en <strong style="color:var(--text)">heure de Paris (CEST)</strong>
     </p>
     <div class="import-btns">
       <button class="btn btn-gold" id="btn-import" onclick="adminImport(false)">⬇️ Importer les matchs manquants</button>
-      <button class="btn btn-green" id="btn-sync" onclick="adminSync()">⚡ Sync résultats live</button>
+      <button class="btn btn-green" id="btn-sync" onclick="adminSync()">⚡ Sync résultats maintenant</button>
       <button class="btn btn-ghost" id="btn-reimport" onclick="adminImport(true)">🔄 Tout remplacer</button>
     </div>
     <div class="import-status" id="import-status"></div>
@@ -324,11 +346,14 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
         <div class="form-group"><label>Domicile</label><input id="a-home" type="text" placeholder="France 🇫🇷"></div>
         <div class="form-group"><label>Extérieur</label><input id="a-away" type="text" placeholder="Brésil 🇧🇷"></div>
       </div>
-      <div class="form-group"><label>Date</label><input id="a-date" type="text" placeholder="11 juin · 21h00"></div>
+      <div class="form-group"><label>Date (affichage)</label><input id="a-date" type="text" placeholder="11 juin · 21h00"></div>
       <button class="btn btn-gold" onclick="adminAddMatch()">Ajouter ⚽</button>
     </div>
     <div class="card">
       <div class="card-title">👥 Joueurs inscrits</div>
+      <p style="font-size:0.72rem;color:var(--muted);font-family:'Courier New',monospace;margin-bottom:0.8rem;line-height:1.5">
+        💶 = a réglé sa participation. Clique pour basculer.
+      </p>
       <div id="admin-users"></div>
       <hr class="div">
       <div class="card-title">⚠️ Zone danger</div>
@@ -338,7 +363,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1rem 0}
   </div>
 
   <div class="card">
-    <div class="card-title">📝 Saisir les résultats</div>
+    <div class="card-title">📝 Saisir / corriger les résultats</div>
     <p style="font-size:0.75rem;color:var(--muted);margin-bottom:1rem;font-family:'Courier New',monospace">
       Score final → Valider. Les points sont recalculés instantanément.
     </p>
@@ -369,15 +394,15 @@ async function api(path, method='GET', body=null) {
 }
 async function sync() {
   STATE = await api('/api/data');
-  const ig=document.getElementById('invite-code-group');
-  if(ig) ig.style.display=STATE.invite_required?'':'none';
+  const ig = document.getElementById('invite-code-group');
+  if (ig) ig.style.display = STATE.invite_required ? '' : 'none';
 }
 
 // ═══════════════════════════════════════════════════════════
 //  AUTH
 // ═══════════════════════════════════════════════════════════
 function authTab(t) {
-  document.getElementById('pane-login').style.display = t==='login' ? '' : 'none';
+  document.getElementById('pane-login').style.display = t==='login'    ? '' : 'none';
   document.getElementById('pane-reg').style.display   = t==='register' ? '' : 'none';
   document.querySelectorAll('.tab').forEach((el,i) =>
     el.classList.toggle('active', (i===0&&t==='login')||(i===1&&t==='register')));
@@ -387,8 +412,8 @@ async function doRegister() {
   const name=v('r-name'), pass=v('r-pass'), pass2=v('r-pass2'), invite=v('r-invite');
   if (pass!==pass2) return setAlert('auth-alert','Les mots de passe diffèrent','err');
   try {
-    const body={name,password:pass};
-    if (STATE.invite_required) body.invite_code=invite;
+    const body = {name, password:pass};
+    if (STATE.invite_required) body.invite_code = invite;
     const r = await api('/api/register','POST',body);
     startSession(name, r.isAdmin);
     setAlert('auth-alert','Bienvenue '+name+' 🎉','ok');
@@ -431,7 +456,7 @@ async function goTo(page) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const idx={matches:0,picks:1,leaderboard:2,rules:3};
+  const idx = {matches:0, picks:1, leaderboard:2, rules:3};
   if (idx[page]!==undefined) document.querySelectorAll('.nav-btn')[idx[page]].classList.add('active');
   try {
     await sync();
@@ -449,11 +474,13 @@ async function goTo(page) {
 function renderUserBar() {
   const bar = document.getElementById('user-bar');
   if (!ME) { bar.innerHTML=''; return; }
-  const pts = computePts(ME);
+  const pts  = computePts(ME);
+  const paid = STATE.users[ME]?.paid;
   bar.innerHTML = `<div class="user-pill">
     <div class="avatar">${ME[0].toUpperCase()}</div>
     <span>${ME}</span>
-    ${ADMIN?'<span class="admin-chip">ADMIN</span>':''}
+    ${paid ? '<span title="Participation réglée">💶</span>' : ''}
+    ${ADMIN ? '<span class="admin-chip">ADMIN</span>' : ''}
     <span class="pts-chip">${pts} pts</span>
   </div>`;
 }
@@ -462,28 +489,33 @@ function renderUserBar() {
 //  SCORING
 // ═══════════════════════════════════════════════════════════
 function calcPts(bet, result) {
-  if (!result||!bet) return 0;
-  const rw = result.home>result.away?'home':result.away>result.home?'away':'draw';
-  if (bet.winner!==rw) return 0;
-  let p=3;
-  if (bet.scoreHome!==null&&bet.scoreAway!==null&&bet.scoreHome===result.home&&bet.scoreAway===result.away) p+=2;
+  if (!result || !bet) return 0;
+  const rw = result.home>result.away ? 'home' : result.away>result.home ? 'away' : 'draw';
+  if (bet.winner !== rw) return 0;
+  let p = 3;
+  if (bet.scoreHome!==null && bet.scoreAway!==null &&
+      bet.scoreHome===result.home && bet.scoreAway===result.away) p += 2;
   return p;
 }
 function computePts(u) {
-  const ub=STATE.bets[u]||{};
-  return STATE.matches.reduce((t,m)=>t+(m.result&&ub[m.id]?calcPts(ub[m.id],m.result):0),0);
+  const ub = STATE.bets[u] || {};
+  return STATE.matches.reduce((t,m) => t+(m.result&&ub[m.id] ? calcPts(ub[m.id],m.result) : 0), 0);
 }
 function computeStats(u) {
-  const ub=STATE.bets[u]||{};
-  let pts=0,won=0,exact=0,played=0;
-  STATE.matches.forEach(m=>{
-    if (m.result&&ub[m.id]){played++;const p=calcPts(ub[m.id],m.result);pts+=p;if(p>=3)won++;if(p===5)exact++;}
+  const ub = STATE.bets[u] || {};
+  let pts=0, won=0, exact=0, played=0;
+  STATE.matches.forEach(m => {
+    if (m.result && ub[m.id]) {
+      played++;
+      const p = calcPts(ub[m.id], m.result);
+      pts += p; if (p>=3) won++; if (p===5) exact++;
+    }
   });
-  return {pts,won,exact,played,total_bets:Object.keys(ub).length};
+  return {pts, won, exact, played, total_bets:Object.keys(ub).length};
 }
 
 // ═══════════════════════════════════════════════════════════
-//  MATCHES
+//  FLAGS / TEAMS
 // ═══════════════════════════════════════════════════════════
 const COUNTRY_CODES = {
   'Mexique':'mx','Afrique du Sud':'za','Corée du Sud':'kr','Canada':'ca','Qatar':'qa',
@@ -498,7 +530,6 @@ const COUNTRY_CODES = {
   'Suède':'se','Turquie':'tr','Cameroun':'cm','Nigéria':'ng','Venezuela':'ve','Chili':'cl',
   'Pérou':'pe','Costa Rica':'cr','Honduras':'hn','Jamaïque':'jm','Irak':'iq',
   'Indonésie':'id','Chine':'cn','Thaïlande':'th',
-  // English fallbacks
   'Mexico':'mx','South Africa':'za','South Korea':'kr','Brazil':'br','Morocco':'ma',
   'Haiti':'ht','Scotland':'gb-sct','USA':'us','Australia':'au','Germany':'de',
   'Ivory Coast':'ci','Ecuador':'ec','Netherlands':'nl','Japan':'jp','Tunisia':'tn',
@@ -506,61 +537,68 @@ const COUNTRY_CODES = {
   'Saudi Arabia':'sa','Senegal':'sn','Norway':'no','Argentina':'ar','Algeria':'dz',
   'Austria':'at','Jordan':'jo','Portugal':'pt','Uzbekistan':'uz','Colombia':'co',
   'England':'gb-eng','Croatia':'hr','Ghana':'gh','Panama':'pa','Poland':'pl',
-  'Serbia':'rs','Ukraine':'ua','Denmark':'dk','Sweden':'se','Turkey':'tr',
-  'Cameroon':'cm','Nigeria':'ng','Venezuela':'ve','Chile':'cl','Peru':'pe',
-  'Costa Rica':'cr','Honduras':'hn','Jamaica':'jm','Iraq':'iq','Indonesia':'id',
-  'China':'cn','Thailand':'th','France':'fr','Canada':'ca','Qatar':'qa',
-  'Switzerland':'ch','Paraguay':'py','Uruguay':'uy',
+  'Serbia':'rs','Denmark':'dk','Sweden':'se','Turkey':'tr','Cameroon':'cm',
+  'Nigeria':'ng','Venezuela':'ve','Chile':'cl','Peru':'pe','Costa Rica':'cr',
+  'Honduras':'hn','Jamaica':'jm','Iraq':'iq','Indonesia':'id','China':'cn','Thailand':'th',
 };
 
-function getCountryCode(teamName) {
-  const name = noFlag(teamName);
-  return COUNTRY_CODES[name] || null;
-}
-
+function getCountryCode(teamName) { return COUNTRY_CODES[noFlag(teamName)] || null; }
 function flag(team) {
   const code = getCountryCode(team);
   if (code) return `<img src="https://flagcdn.com/w80/${code}.png" alt="${noFlag(team)}" style="width:42px;height:auto;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.35);display:inline-block;vertical-align:middle;">`;
-  const m=team.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})+$/u);
-  return m?`<span style="font-size:1.9rem">${m[0]}</span>`:'<span style="font-size:1.9rem">🏳️</span>';
+  const m = team.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})+$/u);
+  return m ? `<span style="font-size:1.9rem">${m[0]}</span>` : '<span style="font-size:1.9rem">🏳️</span>';
 }
 function noFlag(team) { return team.replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})+$/u,'').trim(); }
 
+// ═══════════════════════════════════════════════════════════
+//  MATCHES
+// ═══════════════════════════════════════════════════════════
 function renderMatches() {
-  const phases=[...new Set(STATE.matches.map(m=>m.phase))];
-  const fEl=document.getElementById('phase-filters');
-  fEl.innerHTML=`<button class="f-btn ${PHASE_FILTER==='all'?'active':''}" onclick="setFilter('all')">Tous</button>`
-    +phases.map(p=>`<button class="f-btn ${PHASE_FILTER===p?'active':''}" onclick="setFilter('${p.replace(/'/g,"\\'")}')">${p}</button>`).join('');
+  const phases = [...new Set(STATE.matches.map(m=>m.phase))];
+  const fEl = document.getElementById('phase-filters');
+  fEl.innerHTML = `<button class="f-btn ${PHASE_FILTER==='all'?'active':''}" onclick="setFilter('all')">Tous</button>`
+    + phases.map(p=>`<button class="f-btn ${PHASE_FILTER===p?'active':''}" onclick="setFilter('${p.replace(/'/g,"\\'")}')">${p}</button>`).join('');
 
-  const list=PHASE_FILTER==='all'?STATE.matches:STATE.matches.filter(m=>m.phase===PHASE_FILTER);
-  const grid=document.getElementById('matches-grid');
-  if (!list.length){grid.innerHTML='<div class="empty"><div class="ico">⚽</div>Aucun match ici</div>';return;}
+  const list = PHASE_FILTER==='all' ? STATE.matches : STATE.matches.filter(m=>m.phase===PHASE_FILTER);
+  const grid = document.getElementById('matches-grid');
+  if (!list.length) { grid.innerHTML='<div class="empty"><div class="ico">⚽</div>Aucun match ici</div>'; return; }
 
-  grid.innerHTML=list.map(m=>{
-    const ub=ME&&STATE.bets[ME]&&STATE.bets[ME][m.id];
-    const sel=PICKS[m.id]||(ub?ub.winner:null);
-    const sh=ub?.scoreHome??'';
-    const sa=ub?.scoreAway??'';
-    let inner='';
+  grid.innerHTML = list.map(m => {
+    const ub      = ME && STATE.bets[ME] && STATE.bets[ME][m.id];
+    const sel     = PICKS[m.id] || (ub ? ub.winner : null);
+    const sh      = ub?.scoreHome ?? '';
+    const sa      = ub?.scoreAway ?? '';
+    const started = !!m.started;   // flag calculé côté serveur
+    let inner = '';
 
     if (!ME) {
-      inner=`<div class="login-prompt">🔑 Connecte-toi pour parier</div>`;
+      inner = `<div class="login-prompt">🔑 Connecte-toi pour parier</div>`;
     } else if (m.result) {
-      const r=m.result;
-      const rw=r.home>r.away?'home':r.away>r.home?'away':'draw';
-      const rwL=rw==='home'?noFlag(m.home):rw==='away'?noFlag(m.away):'Match nul';
-      inner=`<div class="bet-area"><div class="badge b-result">⚽ ${r.home}–${r.away} · ${rwL}</div>`;
+      // Match terminé
+      const r  = m.result;
+      const rw = r.home>r.away ? 'home' : r.away>r.home ? 'away' : 'draw';
+      const rwL= rw==='home' ? noFlag(m.home) : rw==='away' ? noFlag(m.away) : 'Match nul';
+      inner = `<div class="bet-area"><div class="badge b-result">⚽ ${r.home}–${r.away} · ${rwL}</div>`;
       if (ub) {
-        const p=calcPts(ub,r);
-        inner+=`<div class="badge ${p===5?'b-won':p>=3?'b-partial':p>0?'b-partial':'b-lost'}">
+        const p = calcPts(ub, r);
+        inner += `<div class="badge ${p===5?'b-won':p>=3?'b-partial':p>0?'b-partial':'b-lost'}">
           ${p===5?'🌟 Score exact ! +5 pts':p===3?'✅ Bon résultat +3 pts':p>0?'🎯 +'+p+' pts':'❌ Raté'}
         </div>`;
       } else {
-        inner+=`<div class="badge b-nobet">Tu n'avais pas parié</div>`;
+        inner += `<div class="badge b-nobet">Tu n'avais pas parié</div>`;
       }
-      inner+='</div>';
+      inner += '</div>';
+    } else if (started) {
+      // Match commencé mais pas encore de résultat
+      inner = `<div class="bet-area">
+        <div class="b-started">🔴 Match en cours — paris fermés</div>
+        ${ub ? `<div class="badge b-pending" style="margin-top:0.6rem">🕐 Ton pari : ${ub.winner==='home'?noFlag(m.home):ub.winner==='away'?noFlag(m.away):'Nul'}
+          ${ub.scoreHome!==null&&ub.scoreAway!==null?' · '+ub.scoreHome+'–'+ub.scoreAway:''}</div>` : '<div class="badge b-nobet" style="margin-top:0.6rem">Aucun pari placé</div>'}
+      </div>`;
     } else {
-      inner=`<div class="bet-area">
+      // Match à venir — pari possible
+      inner = `<div class="bet-area">
         <div class="bet-lbl">VAINQUEUR</div>
         <div class="winner-row">
           <div class="w-btn ${sel==='home'?'sh':''}" onclick="pick('${m.id}','home',this)">${noFlag(m.home)}</div>
@@ -577,13 +615,13 @@ function renderMatches() {
           ⚠️ Score incohérent avec le vainqueur choisi
         </div>
         <button class="btn btn-gold btn-full btn-sm" onclick="placeBet('${m.id}')">
-          ${ub?'✏️ Modifier mon pari':'💰 Valider mon pari'}
+          ${ub ? '✏️ Modifier mon pari' : '💰 Valider mon pari'}
         </button>
-        ${ub?'<div class="badge b-pending">🕐 Pari en attente du match</div>':''}
+        ${ub ? '<div class="badge b-pending">🕐 Pari en attente du match</div>' : ''}
       </div>`;
     }
 
-    return `<div class="match-card">
+    return `<div class="match-card ${started&&!m.result?'started':''}">
       <div class="match-meta">
         <span class="match-phase">${m.phase}</span>
         <span class="match-date">📅 ${m.date}</span>
@@ -598,99 +636,97 @@ function renderMatches() {
   }).join('');
 }
 
-function setFilter(f){PHASE_FILTER=f;renderMatches();}
-function pick(mid,winner,el){
-  PICKS[mid]=winner;
+function setFilter(f) { PHASE_FILTER=f; renderMatches(); }
+function pick(mid, winner, el) {
+  PICKS[mid] = winner;
   el.closest('.match-card').querySelectorAll('.w-btn').forEach(b=>b.className='w-btn');
   el.classList.add({home:'sh',draw:'sd',away:'sa'}[winner]);
-  enforceScoreConsistency(mid,winner);
+  enforceScoreConsistency(mid, winner);
 }
 
-function enforceScoreConsistency(mid,winner){
-  const shEl=document.getElementById('sh-'+mid);
-  const saEl=document.getElementById('sa-'+mid);
-  if(!shEl||!saEl)return;
+function enforceScoreConsistency(mid, winner) {
+  const shEl = document.getElementById('sh-'+mid);
+  const saEl = document.getElementById('sa-'+mid);
+  if (!shEl||!saEl) return;
   let sh=parseInt(shEl.value), sa=parseInt(saEl.value);
-  if(isNaN(sh)||isNaN(sa))return;
-  if(winner==='home'&&sa>sh){let t=sa;saEl.value=sh;shEl.value=t;if(parseInt(shEl.value)<=parseInt(saEl.value))saEl.value=Math.max(0,parseInt(shEl.value)-1);flash(shEl);flash(saEl);}
-  else if(winner==='away'&&sh>sa){let t=sh;shEl.value=sa;saEl.value=t;if(parseInt(saEl.value)<=parseInt(shEl.value))shEl.value=Math.max(0,parseInt(saEl.value)-1);flash(shEl);flash(saEl);}
-  else if(winner==='draw'&&sh!==sa){saEl.value=sh;flash(saEl);}
-  checkWarn(mid,winner);
+  if (isNaN(sh)||isNaN(sa)) return;
+  if (winner==='home'&&sa>sh) { let t=sa; saEl.value=sh; shEl.value=t; if(parseInt(shEl.value)<=parseInt(saEl.value)) saEl.value=Math.max(0,parseInt(shEl.value)-1); flash(shEl); flash(saEl); }
+  else if (winner==='away'&&sh>sa) { let t=sh; shEl.value=sa; saEl.value=t; if(parseInt(saEl.value)<=parseInt(shEl.value)) shEl.value=Math.max(0,parseInt(saEl.value)-1); flash(shEl); flash(saEl); }
+  else if (winner==='draw'&&sh!==sa) { saEl.value=sh; flash(saEl); }
+  checkWarn(mid, winner);
+}
+function flash(el) { el.style.background='rgba(242,193,78,0.3)'; setTimeout(()=>el.style.background='',700); }
+function checkWarn(mid, winner) {
+  const w = document.getElementById('score-warn-'+mid);
+  if (!w) return;
+  const sh = parseInt(document.getElementById('sh-'+mid)?.value);
+  const sa = parseInt(document.getElementById('sa-'+mid)?.value);
+  if (isNaN(sh)||isNaN(sa)) { w.style.display='none'; return; }
+  const bad = (winner==='home'&&sa>sh)||(winner==='away'&&sh>sa)||(winner==='draw'&&sh!==sa);
+  w.style.display = bad ? 'block' : 'none';
+}
+function onScoreInput(mid) {
+  const winner = PICKS[mid] || (STATE.bets[ME]?.[mid]?.winner || null);
+  if (!winner) return;
+  checkWarn(mid, winner);
 }
 
-function flash(el){
-  el.style.background='rgba(242,193,78,0.3)';
-  setTimeout(()=>el.style.background='',700);
-}
-
-function checkWarn(mid,winner){
-  const w=document.getElementById('score-warn-'+mid);
-  if(!w)return;
-  const sh=parseInt(document.getElementById('sh-'+mid)?.value);
-  const sa=parseInt(document.getElementById('sa-'+mid)?.value);
-  if(isNaN(sh)||isNaN(sa)){w.style.display='none';return;}
-  const bad=(winner==='home'&&sa>sh)||(winner==='away'&&sh>sa)||(winner==='draw'&&sh!==sa);
-  w.style.display=bad?'block':'none';
-}
-
-function onScoreInput(mid){
-  const winner=PICKS[mid]||(STATE.bets[ME]?.[mid]?.winner||null);
-  if(!winner)return;
-  checkWarn(mid,winner);
-}
-async function placeBet(mid){
-  if (!ME){toast('Connecte-toi d\'abord !');return;}
-  const winner=PICKS[mid]||(STATE.bets[ME]?.[mid]?.winner||null);
-  if (!winner){toast('Choisis un vainqueur !');return;}
-  const sh=parseInt(document.getElementById('sh-'+mid)?.value);
-  const sa=parseInt(document.getElementById('sa-'+mid)?.value);
-  // Validation cohérence score / vainqueur
-  if(!isNaN(sh)&&!isNaN(sa)){
-    if(winner==='home'&&sa>sh){toast('⚠️ Score incohérent : dom. gagnant mais score défavorable !');return;}
-    if(winner==='away'&&sh>sa){toast('⚠️ Score incohérent : ext. gagnant mais score défavorable !');return;}
-    if(winner==='draw'&&sh!==sa){toast('⚠️ Score incohérent : nul annoncé mais scores différents !');return;}
+async function placeBet(mid) {
+  if (!ME) { toast('Connecte-toi d\'abord !'); return; }
+  const m = STATE.matches.find(x=>x.id===mid);
+  if (m?.started) { toast('⛔ Le match a déjà commencé !'); return; }
+  const winner = PICKS[mid] || (STATE.bets[ME]?.[mid]?.winner || null);
+  if (!winner) { toast('Choisis un vainqueur !'); return; }
+  const sh = parseInt(document.getElementById('sh-'+mid)?.value);
+  const sa = parseInt(document.getElementById('sa-'+mid)?.value);
+  if (!isNaN(sh)&&!isNaN(sa)) {
+    if (winner==='home'&&sa>sh)  { toast('⚠️ Score incohérent !'); return; }
+    if (winner==='away'&&sh>sa)  { toast('⚠️ Score incohérent !'); return; }
+    if (winner==='draw'&&sh!==sa){ toast('⚠️ Score incohérent !'); return; }
   }
   try {
-    await api('/api/bet','POST',{username:ME,matchId:mid,winner,scoreHome:isNaN(sh)?null:sh,scoreAway:isNaN(sa)?null:sa});
+    await api('/api/bet','POST',{username:ME, matchId:mid, winner, scoreHome:isNaN(sh)?null:sh, scoreAway:isNaN(sa)?null:sa});
     toast('Pari enregistré ✅'); await sync(); renderMatches(); renderUserBar();
-  } catch(e){toast('Erreur : '+e.message);}
+  } catch(e) { toast('Erreur : '+e.message); }
 }
 
 // ═══════════════════════════════════════════════════════════
 //  MY PICKS
 // ═══════════════════════════════════════════════════════════
-function renderPicks(){
+function renderPicks() {
   if (!ME) return;
-  const s=computeStats(ME);
-  document.getElementById('picks-stats').innerHTML=`
+  const s = computeStats(ME);
+  document.getElementById('picks-stats').innerHTML = `
     <div class="stat-chip"><div class="stat-val">${s.pts}</div><div class="stat-lbl">Points</div></div>
     <div class="stat-chip"><div class="stat-val">${s.total_bets}</div><div class="stat-lbl">Paris placés</div></div>
     <div class="stat-chip"><div class="stat-val">${s.won}</div><div class="stat-lbl">Bons résultats</div></div>
     <div class="stat-chip"><div class="stat-val">${s.exact}</div><div class="stat-lbl">Scores exacts</div></div>`;
 
-  const ub=STATE.bets[ME]||{};
-  const bet_m=STATE.matches.filter(m=>ub[m.id]);
-  const nobet_m=STATE.matches.filter(m=>!ub[m.id]&&!m.result);
-  const cont=document.getElementById('picks-content');
+  const ub     = STATE.bets[ME] || {};
+  const bet_m  = STATE.matches.filter(m=>ub[m.id]);
+  const nobet_m= STATE.matches.filter(m=>!ub[m.id]&&!m.result&&!m.started);
+  const cont   = document.getElementById('picks-content');
 
-  if (!bet_m.length&&!nobet_m.length){cont.innerHTML='<div class="empty"><div class="ico">🎯</div>Aucun pari — va dans Matchs !</div>';return;}
+  if (!bet_m.length&&!nobet_m.length) { cont.innerHTML='<div class="empty"><div class="ico">🎯</div>Aucun pari — va dans Matchs !</div>'; return; }
 
-  let html='';
-  if (bet_m.length){
-    html+='<div class="card"><div class="card-title">✅ Paris placés</div>';
-    bet_m.forEach(m=>{
-      const b=ub[m.id];
-      const wL=b.winner==='home'?m.home:b.winner==='away'?m.away:'Match nul';
-      const sc=b.scoreHome!==null&&b.scoreAway!==null?`${b.scoreHome}–${b.scoreAway}`:'Score non prédit';
-      let badge='';
-      if (m.result){
-        const p=calcPts(b,m.result);
-        badge=`<div class="badge ${p===5?'b-won':p>=3?'b-partial':p>0?'b-partial':'b-lost'}" style="width:auto;display:inline-flex">
+  let html = '';
+  if (bet_m.length) {
+    html += '<div class="card"><div class="card-title">✅ Paris placés</div>';
+    bet_m.forEach(m => {
+      const b  = ub[m.id];
+      const wL = b.winner==='home' ? m.home : b.winner==='away' ? m.away : 'Match nul';
+      const sc = b.scoreHome!==null&&b.scoreAway!==null ? `${b.scoreHome}–${b.scoreAway}` : 'Score non prédit';
+      let badge = '';
+      if (m.result) {
+        const p = calcPts(b, m.result);
+        badge = `<div class="badge ${p===5?'b-won':p>=3?'b-partial':p>0?'b-partial':'b-lost'}" style="width:auto;display:inline-flex">
           ${p===5?'🌟 +5':p===3?'✅ +3':p>0?'🎯 +'+p:'❌ 0'} pts</div>`;
+      } else if (m.started) {
+        badge = `<span class="badge b-started" style="width:auto;display:inline-flex;margin-top:0">🔴 En cours</span>`;
       } else {
-        badge=`<span class="badge b-pending" style="width:auto;display:inline-flex">🕐 En attente</span>`;
+        badge = `<span class="badge b-pending" style="width:auto;display:inline-flex">🕐 En attente</span>`;
       }
-      html+=`<div class="pick-row">
+      html += `<div class="pick-row">
         <div class="pick-match"><strong>${noFlag(m.home)} vs ${noFlag(m.away)}</strong>
           <div class="pick-meta">${m.phase} · ${m.date}</div></div>
         <div style="text-align:right">
@@ -699,37 +735,41 @@ function renderPicks(){
         </div>
       </div>`;
     });
-    html+='</div>';
+    html += '</div>';
   }
-  if (nobet_m.length){
-    html+='<div class="card" style="margin-top:1rem"><div class="card-title">⏳ Matchs sans pari</div>';
-    nobet_m.forEach(m=>{
-      html+=`<div class="pick-row">
+  if (nobet_m.length) {
+    html += '<div class="card" style="margin-top:1rem"><div class="card-title">⏳ Matchs sans pari (encore ouverts)</div>';
+    nobet_m.forEach(m => {
+      html += `<div class="pick-row">
         <div class="pick-match"><strong>${noFlag(m.home)} vs ${noFlag(m.away)}</strong>
           <div class="pick-meta">${m.phase} · ${m.date}</div></div>
         <button class="btn btn-ghost btn-sm" onclick="goTo('matches')">Parier →</button>
       </div>`;
     });
-    html+='</div>';
+    html += '</div>';
   }
-  cont.innerHTML=html;
+  cont.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════════════════
 //  LEADERBOARD
 // ═══════════════════════════════════════════════════════════
-function renderLB(){
-  const ranked=Object.keys(STATE.users)
-    .map(u=>({u,...computeStats(u)}))
-    .sort((a,b)=>b.pts-a.pts||b.won-a.won||b.exact-a.exact);
-  const medals=['🥇','🥈','🥉'];
-  const cont=document.getElementById('lb-content');
-  if (!ranked.length){cont.innerHTML='<div class="empty"><div class="ico">🏅</div>Aucun joueur encore</div>';return;}
-  cont.innerHTML=ranked.map((r,i)=>`
+function renderLB() {
+  const ranked = Object.keys(STATE.users)
+    .map(u => ({u, ...computeStats(u), paid: STATE.users[u]?.paid}))
+    .sort((a,b) => b.pts-a.pts || b.won-a.won || b.exact-a.exact);
+  const medals = ['🥇','🥈','🥉'];
+  const cont   = document.getElementById('lb-content');
+  if (!ranked.length) { cont.innerHTML='<div class="empty"><div class="ico">🏅</div>Aucun joueur encore</div>'; return; }
+  cont.innerHTML = ranked.map((r,i) => `
     <div class="lb-row ${r.u===ME?'me':''}">
       <div class="lb-rank">${medals[i]||'#'+(i+1)}</div>
       <div class="lb-info">
-        <div class="lb-name">${r.u===ME?'<strong>'+r.u+'</strong> <span style="color:var(--gold);font-size:0.72rem">(toi)</span>':r.u}</div>
+        <div class="lb-name">
+          ${r.u===ME ? '<strong>'+r.u+'</strong>' : r.u}
+          ${r.u===ME ? '<span style="color:var(--gold);font-size:0.72rem">(toi)</span>' : ''}
+          <span class="${r.paid?'paid-badge':'unpaid-badge'}" title="${r.paid?'Participation réglée':'Participation non réglée'}">💶</span>
+        </div>
         <div class="lb-sub">${r.played} match(s) · ${r.won} bons résultats · ${r.exact} scores exacts</div>
       </div>
       <div class="lb-pts">${r.pts} <span>pts</span></div>
@@ -739,27 +779,42 @@ function renderLB(){
 // ═══════════════════════════════════════════════════════════
 //  ADMIN
 // ═══════════════════════════════════════════════════════════
-function renderAdmin(){
-  if (!ADMIN){goTo('matches');return;}
+function renderAdmin() {
+  if (!ADMIN) { goTo('matches'); return; }
   loadInviteSettings();
-  document.getElementById('admin-users').innerHTML=Object.keys(STATE.users).map(u=>`
-    <div class="user-row">
-      <span style="font-family:'Courier New',monospace;font-size:0.82rem">${STATE.users[u].isAdmin?'👑':''} ${u}</span>
-      <div style="display:flex;align-items:center;gap:0.5rem">
-        <span style="color:var(--gold);font-weight:bold;font-family:'Courier New',monospace">${computePts(u)} pts</span>
-        ${u!==ME?`<button class="btn btn-ghost btn-sm" onclick="adminPromote('${u}')">
-          ${STATE.users[u].isAdmin?'Retirer admin':'Rendre admin'}</button>
-          <button class="btn btn-danger btn-sm" onclick="adminDelUser('${u}')">🗑️</button>`:''}
-      </div>
-    </div>`).join('')||'<div style="color:var(--muted);font-size:0.82rem">Aucun utilisateur</div>';
 
-  document.getElementById('admin-results').innerHTML=STATE.matches.map(m=>{
-    const r=m.result;
+  // Liste des joueurs avec bouton "Payé"
+  document.getElementById('admin-users').innerHTML = Object.keys(STATE.users).map(u => {
+    const isPaid = STATE.users[u]?.paid;
+    return `<div class="user-row">
+      <div class="user-name-cell">
+        ${STATE.users[u].isAdmin ? '👑' : ''}
+        <span>${u}</span>
+        <span title="${isPaid?'Participation réglée':'Non réglé'}" style="font-size:0.95rem;${isPaid?'':'opacity:0.3'}"">💶</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap">
+        <span style="color:var(--gold);font-weight:bold;font-family:'Courier New',monospace;font-size:0.8rem">${computePts(u)} pts</span>
+        <button class="btn btn-sm ${isPaid?'btn-paid':'btn-unpaid'}" onclick="adminTogglePaid('${u}')">
+          ${isPaid ? '💶 Réglé' : '💸 Non réglé'}
+        </button>
+        ${u !== ME ? `
+          <button class="btn btn-ghost btn-sm" onclick="adminPromote('${u}')" title="${STATE.users[u].isAdmin?'Retirer admin':'Rendre admin'}">
+            ${STATE.users[u].isAdmin ? '👑 -Admin' : '👑 +Admin'}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="adminDelUser('${u}')">🗑️</button>` : ''}
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:0.82rem">Aucun utilisateur</div>';
+
+  // Saisie des résultats
+  document.getElementById('admin-results').innerHTML = STATE.matches.map(m => {
+    const r = m.result;
     return `<div class="adm-row">
       <div class="lbl">
         <div style="font-size:0.68rem;color:var(--muted);font-family:'Courier New',monospace">${m.phase} · ${m.date}</div>
         <strong>${noFlag(m.home)} vs ${noFlag(m.away)}</strong>
-        ${r?`<div style="font-size:0.68rem;color:var(--green);font-family:'Courier New',monospace;margin-top:0.15rem">✅ ${r.home}–${r.away}</div>`:''}
+        ${r ? `<div style="font-size:0.68rem;color:var(--green);font-family:'Courier New',monospace;margin-top:0.15rem">✅ ${r.home}–${r.away}</div>` : ''}
+        ${m.started&&!r ? '<div style="font-size:0.68rem;color:var(--red);font-family:\'Courier New\',monospace">🔴 En cours</div>' : ''}
       </div>
       <input type="number" id="rh-${m.id}" min="0" max="30" value="${r?r.home:''}" placeholder="Dom">
       <span style="color:var(--muted)">–</span>
@@ -767,139 +822,152 @@ function renderAdmin(){
       <button class="btn btn-gold btn-sm" onclick="adminResult('${m.id}')">✅ Valider</button>
       <button class="btn btn-danger btn-sm" onclick="adminDel('${m.id}')">🗑️</button>
     </div>`;
-  }).join('')||'<div style="color:var(--muted);font-size:0.82rem;padding:0.5rem">Aucun match — utilise le bouton Import ci-dessus !</div>';
+  }).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:0.5rem">Aucun match — utilise le bouton Import ci-dessus !</div>';
 }
 
 // ═══════════════════════════════════════════════════════════
 //  ADMIN — IMPORT & SYNC
 // ═══════════════════════════════════════════════════════════
-async function adminImport(replace){
+async function adminImport(replace) {
   if (replace && !confirm('Remplacer tous les matchs par les données officielles ?\n(Les résultats saisis manuellement sont conservés)')) return;
-  const status=document.getElementById('import-status');
-  const btn=document.getElementById(replace?'btn-reimport':'btn-import');
-  btn.disabled=true;
-  status.style.color='var(--muted)';
-  status.textContent='⏳ Import en cours…';
+  const status = document.getElementById('import-status');
+  const btn    = document.getElementById(replace?'btn-reimport':'btn-import');
+  btn.disabled = true;
+  status.style.color = 'var(--muted)';
+  status.textContent = '⏳ Import en cours…';
   try {
-    const r=await api('/api/admin/import','POST',{username:ME,replace});
-    status.style.color='var(--green)';
-    status.textContent=`✅ ${r.imported} match(s) importé(s) — total : ${r.total} matchs en base`;
+    const r = await api('/api/admin/import','POST',{username:ME, replace});
+    status.style.color = 'var(--green)';
+    status.textContent = `✅ ${r.imported} match(s) importé(s) — total : ${r.total} matchs en base`;
     toast(`✅ ${r.imported} matchs importés !`);
     await sync(); renderAdmin(); renderMatches();
   } catch(e) {
-    status.style.color='var(--red)';
-    status.textContent='❌ '+e.message;
+    status.style.color = 'var(--red)';
+    status.textContent = '❌ '+e.message;
     toast('Erreur : '+e.message);
-  } finally { btn.disabled=false; }
+  } finally { btn.disabled = false; }
 }
 
-async function adminSync(){
-  const status=document.getElementById('import-status');
-  const btn=document.getElementById('btn-sync');
-  btn.disabled=true;
-  status.style.color='var(--muted)';
-  status.textContent='⏳ Synchronisation des résultats…';
+async function adminSync() {
+  const status = document.getElementById('import-status');
+  const btn    = document.getElementById('btn-sync');
+  btn.disabled = true;
+  status.style.color = 'var(--muted)';
+  status.textContent = '⏳ Synchronisation des résultats…';
   try {
-    const r=await api('/api/admin/sync','POST',{username:ME});
-    const msg=r.updated>0?`⚡ ${r.updated} nouveau(x) résultat(s) synchronisé(s)`:'✅ Aucun nouveau résultat disponible pour l\'instant';
-    status.style.color=r.updated>0?'var(--green)':'var(--muted)';
-    status.textContent=msg;
+    const r = await api('/api/admin/sync','POST',{username:ME});
+    const msg = r.updated>0 ? `⚡ ${r.updated} nouveau(x) résultat(s) synchronisé(s)` : '✅ Aucun nouveau résultat disponible pour l\'instant';
+    status.style.color = r.updated>0 ? 'var(--green)' : 'var(--muted)';
+    status.textContent = msg;
     toast(msg);
-    if (r.updated>0){await sync(); renderAdmin(); renderUserBar();}
+    if (r.updated>0) { await sync(); renderAdmin(); renderUserBar(); }
   } catch(e) {
-    status.style.color='var(--red)';
-    status.textContent='❌ '+e.message;
+    status.style.color = 'var(--red)';
+    status.textContent = '❌ '+e.message;
     toast('Erreur : '+e.message);
-  } finally { btn.disabled=false; }
+  } finally { btn.disabled = false; }
 }
 
 // ═══════════════════════════════════════════════════════════
 //  ADMIN — CRUD
 // ═══════════════════════════════════════════════════════════
-async function adminAddMatch(){
-  const home=v('a-home'), away=v('a-away');
-  if (!home||!away){toast('Remplis les deux équipes !');return;}
+async function adminAddMatch() {
+  const home = v('a-home'), away = v('a-away');
+  if (!home||!away) { toast('Remplis les deux équipes !'); return; }
   try {
-    await api('/api/admin/match','POST',{username:ME,phase:document.getElementById('a-phase').value,home,away,date:v('a-date')||'TBD'});
+    await api('/api/admin/match','POST',{username:ME, phase:document.getElementById('a-phase').value, home, away, date:v('a-date')||'TBD'});
     document.getElementById('a-home').value='';
     document.getElementById('a-away').value='';
     document.getElementById('a-date').value='';
     toast('Match ajouté ✅'); await sync(); renderAdmin();
-  } catch(e){toast(e.message);}
+  } catch(e) { toast(e.message); }
 }
-async function adminResult(mid){
-  const rh=parseInt(document.getElementById('rh-'+mid).value);
-  const ra=parseInt(document.getElementById('ra-'+mid).value);
-  if (isNaN(rh)||isNaN(ra)){toast('Saisis les deux scores !');return;}
+async function adminResult(mid) {
+  const rh = parseInt(document.getElementById('rh-'+mid).value);
+  const ra = parseInt(document.getElementById('ra-'+mid).value);
+  if (isNaN(rh)||isNaN(ra)) { toast('Saisis les deux scores !'); return; }
   try {
-    await api('/api/admin/result','POST',{username:ME,matchId:mid,home:rh,away:ra});
+    await api('/api/admin/result','POST',{username:ME, matchId:mid, home:rh, away:ra});
     toast('Résultat enregistré 🏆'); await sync(); renderAdmin(); renderUserBar();
-  } catch(e){toast(e.message);}
+  } catch(e) { toast(e.message); }
 }
-async function adminDel(mid){
+async function adminDel(mid) {
   if (!confirm('Supprimer ce match et ses paris ?')) return;
-  try { await api(`/api/admin/match/${mid}?username=${encodeURIComponent(ME)}`,'DELETE'); toast('Supprimé'); await sync(); renderAdmin(); }
-  catch(e){toast(e.message);}
-}
-async function adminPromote(target){
   try {
-    const r=await api('/api/admin/promote','POST',{username:ME,target});
-    toast(r.isAdmin?target+' est admin 👑':'Droits retirés');
-    await sync(); renderAdmin();
-  } catch(e){toast(e.message);}
+    await api(`/api/admin/match/${mid}?username=${encodeURIComponent(ME)}`,'DELETE');
+    toast('Supprimé'); await sync(); renderAdmin();
+  } catch(e) { toast(e.message); }
 }
-async function adminDelUser(target){
+async function adminPromote(target) {
+  try {
+    const r = await api('/api/admin/promote','POST',{username:ME, target});
+    toast(r.isAdmin ? target+' est admin 👑' : 'Droits retirés');
+    await sync(); renderAdmin();
+  } catch(e) { toast(e.message); }
+}
+async function adminDelUser(target) {
   if (!confirm(`Supprimer le compte "${target}" et tous ses paris ?`)) return;
   try {
     await api(`/api/admin/user/${encodeURIComponent(target)}?username=${encodeURIComponent(ME)}`,'DELETE');
     toast(`${target} supprimé 🗑️`);
     await sync(); renderAdmin(); renderLB();
-  } catch(e){toast(e.message);}
+  } catch(e) { toast(e.message); }
 }
-async function adminReset(){
+async function adminReset() {
   if (!confirm('Vider tous les matchs et paris ? (les comptes sont conservés)')) return;
-  try { await api('/api/admin/reset','POST',{username:ME}); toast('Vidé'); await sync(); renderAdmin(); }
-  catch(e){toast(e.message);}
+  try {
+    await api('/api/admin/reset','POST',{username:ME});
+    toast('Vidé'); await sync(); renderAdmin();
+  } catch(e) { toast(e.message); }
+}
+
+// Toggle statut payé
+async function adminTogglePaid(target) {
+  try {
+    const r = await api(`/api/admin/user/${encodeURIComponent(target)}/paid`,'POST',{username:ME});
+    toast(r.paid ? `💶 ${target} marqué comme réglé` : `${target} marqué comme non réglé`);
+    await sync(); renderAdmin(); renderLB();
+  } catch(e) { toast(e.message); }
 }
 
 // ═══════════════════════════════════════════════════════════
 //  ADMIN — INVITE CODE
 // ═══════════════════════════════════════════════════════════
-async function loadInviteSettings(){
+async function loadInviteSettings() {
   try {
-    const r=await api(`/api/admin/settings?username=${encodeURIComponent(ME)}`);
-    const s=r.settings||{};
-    const toggle=document.getElementById('invite-toggle');
-    const label=document.getElementById('invite-toggle-label');
-    const panel=document.getElementById('invite-code-settings');
-    const input=document.getElementById('invite-code-input');
-    toggle.checked=!!s.invite_required;
-    label.textContent=s.invite_required?'Activé':'Désactivé';
-    label.style.color=s.invite_required?'var(--green)':'var(--muted)';
-    panel.style.display=s.invite_required?'':'none';
-    input.value=s.invite_code||'';
-  } catch(e){}
+    const r = await api(`/api/admin/settings?username=${encodeURIComponent(ME)}`);
+    const s = r.settings || {};
+    const toggle = document.getElementById('invite-toggle');
+    const label  = document.getElementById('invite-toggle-label');
+    const panel  = document.getElementById('invite-code-settings');
+    const input  = document.getElementById('invite-code-input');
+    toggle.checked = !!s.invite_required;
+    label.textContent = s.invite_required ? 'Activé' : 'Désactivé';
+    label.style.color = s.invite_required ? 'var(--green)' : 'var(--muted)';
+    panel.style.display = s.invite_required ? '' : 'none';
+    input.value = s.invite_code || '';
+  } catch(e) {}
 }
-async function adminToggleInvite(){
-  const on=document.getElementById('invite-toggle').checked;
+async function adminToggleInvite() {
+  const on = document.getElementById('invite-toggle').checked;
   try {
-    await api('/api/admin/settings','POST',{username:ME,invite_required:on});
-    toast(on?'Code d\'invitation activé 🔐':'Code d\'invitation désactivé 🔓');
+    await api('/api/admin/settings','POST',{username:ME, invite_required:on});
+    toast(on ? 'Code d\'invitation activé 🔐' : 'Code d\'invitation désactivé 🔓');
     await sync(); loadInviteSettings();
-  } catch(e){toast(e.message);}
+  } catch(e) { toast(e.message); }
 }
-async function adminSaveInvite(){
-  const code=v('invite-code-input');
-  if(!code){toast('Saisis un code !');return;}
-  const status=document.getElementById('invite-status');
+async function adminSaveInvite() {
+  const code = v('invite-code-input');
+  if (!code) { toast('Saisis un code !'); return; }
+  const status = document.getElementById('invite-status');
   try {
-    await api('/api/admin/settings','POST',{username:ME,invite_code:code});
-    status.style.color='var(--green)';
-    status.textContent='✅ Code enregistré : '+code;
+    await api('/api/admin/settings','POST',{username:ME, invite_code:code});
+    status.style.color = 'var(--green)';
+    status.textContent = '✅ Code enregistré : '+code;
     toast('Code enregistré ✅');
-  } catch(e){
-    status.style.color='var(--red)';
-    status.textContent='❌ '+e.message;
+  } catch(e) {
+    status.style.color = 'var(--red)';
+    status.textContent = '❌ '+e.message;
     toast(e.message);
   }
 }
@@ -907,15 +975,15 @@ async function adminSaveInvite(){
 // ═══════════════════════════════════════════════════════════
 //  UTILS
 // ═══════════════════════════════════════════════════════════
-function v(id){return document.getElementById(id)?.value?.trim()||'';}
-function setAlert(id,msg,type){
-  const el=document.getElementById(id);
-  if (!msg){el.className='alert';return;}
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function setAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!msg) { el.className='alert'; return; }
   el.textContent=msg; el.className='alert show alert-'+(type==='err'?'err':'ok');
 }
 let _t;
-function toast(msg){
-  const el=document.getElementById('toast');
+function toast(msg) {
+  const el = document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
   clearTimeout(_t); _t=setTimeout(()=>el.classList.remove('show'),2800);
 }
