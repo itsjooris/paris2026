@@ -44,7 +44,8 @@ PHASE_FR = {
     "Group A":"Groupe A","Group B":"Groupe B","Group C":"Groupe C","Group D":"Groupe D",
     "Group E":"Groupe E","Group F":"Groupe F","Group G":"Groupe G","Group H":"Groupe H",
     "Group I":"Groupe I","Group J":"Groupe J","Group K":"Groupe K","Group L":"Groupe L",
-    "Round of 32":"Huitièmes","Round of 16":"16e de finale",
+    "Round of 32": "16e de finale",
+    "Round of 16": "Huitièmes",
     "Quarter-final":"Quart de finale","Semi-final":"Demi-finale",
     "Match for third place":"Petite finale","Final":"Finale",
 }
